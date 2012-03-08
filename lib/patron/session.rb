@@ -28,6 +28,7 @@ require 'patron/error'
 require 'patron/request'
 require 'patron/response'
 require 'patron/session_ext'
+require 'patron/caching'
 require 'patron/util'
 
 module Patron
@@ -221,6 +222,15 @@ module Patron
       req.url = url
 
       handle_request(req)
+    end
+
+    def cache_responses!(file=nil)
+      extend(Caching) unless caching?
+      self.response_cache_file = file unless file.nil?
+    end
+
+    def caching_responses?
+      Caching === self
     end
 
   end
