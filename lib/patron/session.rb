@@ -88,6 +88,10 @@ module Patron
       @connect_timeout = 1
       @max_redirects = 5
       @auth_type = :basic
+
+      if self.class.caching_responses?
+        cache_responses!(self.class.response_cache_file)
+      end
     end
 
     # Turn on cookie handling for this session, storing them in memory by
@@ -225,12 +229,25 @@ module Patron
     end
 
     def cache_responses!(file=nil)
-      extend(Caching) unless caching?
-      self.response_cache_file = file unless file.nil?
+      extend Caching unless caching_responses?
+      self.response_cache_file = file
     end
 
     def caching_responses?
       Caching === self
+    end
+
+    class << self
+      attr_reader :response_cache_file
+    end
+
+    def self.cache_responses!(file=nil)
+      include Caching unless caching_responses?
+      @response_cache_file = file
+    end
+
+    def self.caching_responses?
+      self < Caching
     end
 
   end
