@@ -29,7 +29,7 @@ module Patron
     end
 
     def handle_request(request)
-      write_response_cache_on_exit!
+      write_response_cache_on_exit! if @response_cache_file
       response_cache[request] ||= super
     end
   end
